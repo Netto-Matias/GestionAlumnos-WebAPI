@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Timers;
 
 namespace Alumnos.API.Models
 {
     public class Alumno
     {
         public string Nombre { get; set; }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Legajo { get; set; }

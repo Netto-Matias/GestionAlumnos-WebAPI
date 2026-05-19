@@ -5,10 +5,12 @@ namespace Alumnos.API
 {
     public class GestionAlumnosContext : DbContext
     {
-        public DbSet<Alumno> Alumnos { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // Creo el constructor nuevo. Recibe las opciones y se las pasa a la clase base (DbContext)
+        public GestionAlumnosContext(DbContextOptions<GestionAlumnosContext> options) : base(options)
         {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=GestionAlumnosDB;Trusted_Connection=True;TrustServerCertificate=True;");
+
         }
+        public DbSet<Alumno> Alumnos { get; set; }
+        
     }
 }
