@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Alumnos.API.Models;
 using Alumnos.API.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alumnos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // <-- Esto cierra la puerta por completo
     public class AlumnosController : ControllerBase
     {
         // Por convención profesional, las variables inyectadas empiezan con un guion bajo(_)
@@ -18,17 +21,17 @@ namespace Alumnos.API.Controllers
             _db = db;
         }
 
-        // Metodo GET: Para traer datos (Equivale al "Mostrar Alumnos")
+        // Metodo GET
         [HttpGet]
-        public IActionResult ObtenerTodos()
+        public async Task<IActionResult> ObtenerTodos()
         {
-            var listaAlumnos = _db.Alumnos.ToList();
-            return Ok(listaAlumnos); // El "Ok" es el codigo 200 de internet
+            var listaAlumnos = await _db.Alumnos.ToListAsync();
+            return Ok(listaAlumnos); 
         }
 
-        // Metodo POST: Para ENVIAR datos (Equivale al "Agregar Alumnos")
+        // Metodo POST
         [HttpPost]
-        public IActionResult Agregar([FromBody] AlumnoDTO alumnoDto)
+        public async Task<IActionResult> Agregar([FromBody] AlumnoDTO alumnoDto)
         {
             // 1. Recibimos el DTO (Limpio y validado)
             // 2. Armamos la entidad real que va a ir a la base de datos
@@ -40,17 +43,18 @@ namespace Alumnos.API.Controllers
             );
             
             _db.Alumnos.Add(nuevoAlumno);
-            _db.SaveChanges(); // Guardamos en la base de datos
+
+            await _db.SaveChangesAsync(); // Guardamos en la base de datos
 
             return Ok("¡Alumno agregado a la base de datos!");
         }
 
         // Metodo GET por ID: Para buscar un alumno en particular
         [HttpGet("{legajo}")]
-        public IActionResult ObtenerPorLegajo(int legajo)
+        public async Task<IActionResult> ObtenerPorLegajo(int legajo)
         {
-            // Usamos LINQ para buscar el primero que coincida con el legajo
-            var alumno = _db.Alumnos.FirstOrDefault(a => a.Legajo == legajo);
+            // LINQ para buscar el primero que coincida con el legajo
+            var alumno = await _db.Alumnos.FirstOrDefaultAsync(a => a.Legajo == legajo);
 
             if (alumno == null)
             {
@@ -62,9 +66,9 @@ namespace Alumnos.API.Controllers
 
         // Método DELETE: Para dar de baja a un alumno
         [HttpDelete("{legajo}")]
-        public IActionResult Eliminar(int legajo)
+        public async Task<IActionResult> Eliminar(int legajo)
         {
-            var alumno = _db.Alumnos.FirstOrDefault(a => a.Legajo == legajo);
+            var alumno = await _db.Alumnos.FirstOrDefaultAsync(a => a.Legajo == legajo);
 
             if (alumno == null)
             {
@@ -72,7 +76,7 @@ namespace Alumnos.API.Controllers
             }
 
             _db.Alumnos.Remove(alumno); // Lo borramos del borrador
-            _db.SaveChanges(); // Confirmamos el borrado en la base de datos
+            await _db.SaveChangesAsync(); // Confirmamos el borrado en la base de datos
 
             return Ok("¡Alumno borrado correctamente!"); 
         }
