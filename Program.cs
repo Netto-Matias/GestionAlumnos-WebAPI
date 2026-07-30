@@ -7,6 +7,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// EVITA EL ERROR 139 EN RENDER: Desactiva el monitoreo masivo de archivos de inotify
+builder.Configuration.Sources.Clear();
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false)
+    .AddEnvironmentVariables();
+
 
 // Servicios Base
 builder.Services.AddControllers();
