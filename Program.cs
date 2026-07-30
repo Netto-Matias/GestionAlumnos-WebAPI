@@ -68,11 +68,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 // Pipeline 
-if (app.Environment.IsDevelopment())
+// HABILITADO EN PRODUCCIÓN PARA EL PORTFOLIO
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Alumnos v1");
+    c.RoutePrefix = string.Empty; // <--- Esto hace que Swagger abra directamente en la raíz (https://tu-api.onrender.com)
+});
 
 app.UseHttpsRedirection();
 
